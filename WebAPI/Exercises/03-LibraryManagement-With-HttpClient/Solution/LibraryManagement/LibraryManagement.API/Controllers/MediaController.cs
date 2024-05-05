@@ -1,5 +1,4 @@
-﻿using LibraryManagement.Application.Services;
-using LibraryManagement.Core.Entities;
+﻿using LibraryManagement.Core.Entities;
 using LibraryManagement.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +20,7 @@ namespace LibraryManagement.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("types")]
-        [ProducesResponseType(typeof(List<Borrower>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<MediaType>), StatusCodes.Status200OK)]
         public IActionResult GetMediaTypes()
         {
             var result = _mediaService.GetMediaTypes();
@@ -38,7 +37,7 @@ namespace LibraryManagement.API.Controllers
         /// <param name="mediaTypeId"></param>
         /// <returns></returns>
         [HttpGet("types/{mediaTypeId}")]
-        [ProducesResponseType(typeof(List<Borrower>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<Media>), StatusCodes.Status200OK)]
         public IActionResult ListMediaByType(int mediaTypeId)
         {
             var result = _mediaService.ListMedia(mediaTypeId);
@@ -54,7 +53,7 @@ namespace LibraryManagement.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("top")]
-        [ProducesResponseType(typeof(List<Borrower>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<TopMediaItem>), StatusCodes.Status200OK)]
         public IActionResult GetMostPopularMedia()
         {
             var result = _mediaService.GetMostPopularMedia();
@@ -70,7 +69,7 @@ namespace LibraryManagement.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("archived")]
-        [ProducesResponseType(typeof(List<Borrower>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<Media>), StatusCodes.Status200OK)]
         public IActionResult GetArchivedMedia()
         {
             var result = _mediaService.GetArchivedMedia();
@@ -88,7 +87,7 @@ namespace LibraryManagement.API.Controllers
         /// <returns></returns>
         [HttpPost("")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult AddMedia(Media media)
+        public IActionResult AddMedia([FromBody] Media media)
         {
             var result = _mediaService.AddMedia(media);
 
@@ -107,7 +106,7 @@ namespace LibraryManagement.API.Controllers
         /// <returns></returns>
         [HttpPost("{mediaId}/archive")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult ArchiveMedia(int mediaId, Media media)
+        public IActionResult ArchiveMedia(int mediaId, [FromBody] Media media)
         {
             media.MediaID = mediaId;
             var result = _mediaService.ArchiveMedia(media);
@@ -126,7 +125,7 @@ namespace LibraryManagement.API.Controllers
         /// <returns></returns>
         [HttpPut("{mediaId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult EditMedia(int mediaId, Media media)
+        public IActionResult EditMedia(int mediaId, [FromBody] Media media)
         {
             media.MediaID = mediaId;
             var result = _mediaService.EditMedia(media);

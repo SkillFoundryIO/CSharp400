@@ -51,11 +51,11 @@ namespace LibraryManagement.API.Controllers
         /// Checkout a media item
         /// </summary>
         /// <returns></returns>
-        [HttpPost("media/{mediaId}/{borrowerEmail}")]
+        [HttpPost("media/{mediaId}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public IActionResult Checkout(int mediaId, string borrowerEmail)
+        public IActionResult Checkout(int mediaId, [FromBody] string borrowerEmail)
         {
             var result = _checkoutService.Checkout(mediaId, borrowerEmail);
 
