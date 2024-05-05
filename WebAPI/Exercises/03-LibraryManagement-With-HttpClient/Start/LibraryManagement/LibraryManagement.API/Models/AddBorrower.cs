@@ -27,7 +27,7 @@ namespace LibraryManagement.API.Models
                 results.Add(new ValidationResult("White spaces are not allowed in the first name"));
             }
 
-            if (!FirstName.Any(char.IsDigit))
+            if (FirstName.Any(char.IsDigit))
             {
                 results.Add(new ValidationResult("Digits are not allowed in the first name"));
             }
@@ -37,7 +37,7 @@ namespace LibraryManagement.API.Models
                 results.Add(new ValidationResult("White spaces are not allowed in the last name"));
             }
 
-            if (!LastName.Any(char.IsDigit))
+            if (LastName.Any(char.IsDigit))
             {
                 results.Add(new ValidationResult("Digits are not allowed in the last name"));
             }

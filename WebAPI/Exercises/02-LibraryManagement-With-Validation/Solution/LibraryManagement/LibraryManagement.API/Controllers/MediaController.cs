@@ -123,7 +123,7 @@ namespace LibraryManagement.API.Controllers
                 if (result.Ok)
                 {
                     _logger.LogInformation("Media added successfully");
-                    return Created();
+                    return Created("", entity);
                 }
 
                 _logger.LogError("Error adding media. {Mesage}", result.Message);

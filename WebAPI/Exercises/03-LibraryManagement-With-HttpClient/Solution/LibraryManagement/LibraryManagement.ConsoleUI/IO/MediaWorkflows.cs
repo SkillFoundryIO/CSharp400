@@ -1,4 +1,5 @@
-﻿using LibraryManagement.Core.Entities;
+﻿using LibraryManagement.ConsoleUI.Models;
+using LibraryManagement.Core.Entities;
 using System.Text;
 using System.Text.Json;
 
@@ -51,12 +52,12 @@ namespace LibraryManagement.ConsoleUI.IO
 
             if (mediaTypesResult.IsSuccessStatusCode)
             {
-                var data = JsonSerializer.Deserialize<List<MediaType>>(
+                var mediaTypes = JsonSerializer.Deserialize<List<MediaType>>(
                     Utilities.GetStringContentFromResponse(mediaTypesResult),
                     Utilities.GetJsonSerializerOptions());
 
-                var newMedia = new Media();
-                newMedia.MediaTypeID = GetMediaTypeFromUser(data);
+                var newMedia = new AddMedia();
+                newMedia.MediaTypeID = GetMediaTypeFromUser(mediaTypes);
                 newMedia.Title = Utilities.GetRequiredString("Enter title: ");
 
                 var payload = Utilities.ConstructJsonPayload(newMedia);
@@ -64,7 +65,11 @@ namespace LibraryManagement.ConsoleUI.IO
 
                 if (result.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Media added with id {newMedia.MediaID}!");
+                    var data = JsonSerializer.Deserialize<Media>(
+                        Utilities.GetStringContentFromResponse(result),
+                        Utilities.GetJsonSerializerOptions());
+
+                    Console.WriteLine($"Media created with id: {data.MediaID}");
                 }
                 else
                 {
@@ -148,11 +153,20 @@ namespace LibraryManagement.ConsoleUI.IO
                         Utilities.GetStringContentFromResponse(mediaResult),
                         Utilities.GetJsonSerializerOptions());
 
-                    var mediaToEdit = Utilities.SelectMediaFromList(mediaData.Where(m => !m.IsArchived).ToList());
-                    mediaToEdit.Title = Utilities.GetEditedString($"Title ({mediaToEdit.Title}): ", mediaToEdit.Title);
+                    var originalMedia = Utilities.SelectMediaFromList(mediaData.Where(m => !m.IsArchived).ToList());
 
-                    var payload = Utilities.ConstructJsonPayload(mediaToEdit);
-                    var result = httpClient.PutAsync("/api/media/" + mediaToEdit.MediaID, payload).Result;
+                    var editedMedia = new EditMedia()
+                    {
+                        MediaID = originalMedia.MediaID,
+                        MediaTypeID = originalMedia.MediaTypeID,
+                        IsArchived = originalMedia.IsArchived
+                    };
+
+                    editedMedia.Title = Utilities.GetEditedString($"Title ({editedMedia.Title}): ", editedMedia.Title);
+
+
+                    var payload = Utilities.ConstructJsonPayload(editedMedia);
+                    var result = httpClient.PutAsync("/api/media/" + editedMedia.MediaID, payload).Result;
 
                     if (result.IsSuccessStatusCode)
                     {

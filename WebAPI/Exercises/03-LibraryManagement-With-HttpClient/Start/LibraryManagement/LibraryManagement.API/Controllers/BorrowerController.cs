@@ -94,7 +94,7 @@ namespace LibraryManagement.API.Controllers
                 if (result.Ok)
                 {
                     _logger.LogInformation("Successfully added a borrower");
-                    return Created();
+                    return Created("", entity);
                 }
 
                 if (result.Message.Contains("Borrower with email"))

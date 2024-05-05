@@ -1,5 +1,4 @@
-﻿using LibraryManagement.Core.Entities;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace LibraryManagement.ConsoleUI
 {
@@ -18,29 +17,6 @@ namespace LibraryManagement.ConsoleUI
         public Uri GetBaseUri()
         {
             return new Uri(_configuration["BaseUri"]);
-        }
-
-        public string GetConnectionString()
-        {
-            return _configuration["LibraryDb"] ?? "";
-        }
-
-        public DatabaseMode GetDatabaseMode()
-        {
-            if (_configuration["DatabaseMode"] == "")
-            {
-                throw new Exception("DatabaseMode configuration key missing.");
-            }
-
-            switch(_configuration["DatabaseMode"])
-            {
-                case "ORM":
-                    return DatabaseMode.ORM;
-                case "SQL":
-                    return DatabaseMode.DirectSQL;
-                default:
-                    throw new Exception("DatabaseMode configuration key invalid.");
-            }
         }
     }
 }

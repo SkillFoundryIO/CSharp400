@@ -1,65 +1,56 @@
 ﻿using LibraryManagement.Core.Entities;
-using System.Text.Json;
+using LibraryManagement.Core.Interfaces.Services;
 
 namespace LibraryManagement.ConsoleUI.IO
 {
     public static class BorrowerWorkflows
     {
-        public static void GetAllBorrowers(HttpClient httpClient)
+        public static void GetAllBorrowers(IBorrowerService service)
         {
             Console.Clear();
             Console.WriteLine("Borrower List");
             Console.WriteLine($"{"ID",-5} {"Name",-32} Email");
             Console.WriteLine(new string('=', 70));
-            var result = httpClient.GetAsync("/api/borrowers").Result;
+            var result = service.GetAllBorrowers();
 
-            if (result.IsSuccessStatusCode)
+            if (result.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<Borrower>>(
-                    Utilities.GetStringContentFromResponse(result),
-                    Utilities.GetJsonSerializerOptions());
-
-                foreach (var b in data)
+                foreach (var b in result.Data)
                 {
                     Console.WriteLine($"{b.BorrowerID,-5} {b.LastName + ", " + b.FirstName,-32} {b.Email}");
                 }
             }
             else
             {
-
-                Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                Console.WriteLine(result.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void GetBorrower(HttpClient httpClient)
+        public static void GetBorrower(IBorrowerService service)
         {
             Console.Clear();
             var email = Utilities.GetRequiredString("Enter borrower email: ");
-            var result = httpClient.GetAsync("/api/borrowers/" + email).Result;
+            var result = service.GetBorrower(email);
 
-            if (result.IsSuccessStatusCode )
+            if(result.Ok && result.Data != null)
             {
-                var data = JsonSerializer.Deserialize<Borrower>(
-                    Utilities.GetStringContentFromResponse(result),
-                    Utilities.GetJsonSerializerOptions());
-
                 Console.WriteLine("\nBorrower Information");
                 Console.WriteLine("====================");
-                Console.WriteLine($"Id: {data.BorrowerID}");
-                Console.WriteLine($"Name: {data.LastName}, {data.FirstName}");
-                Console.WriteLine($"Email: {data.Email}");
-                Console.WriteLine($"Phone: {data.Phone}");
+                Console.WriteLine($"Id: {result.Data.BorrowerID}");
+                Console.WriteLine($"Name: {result.Data.LastName}, {result.Data.FirstName}");
+                Console.WriteLine($"Email: {result.Data.Email}");
+                Console.WriteLine($"Phone: {result.Data.Phone}");
 
 
-                if (data.CheckoutLogs.Any(c => c.ReturnDate == null))
+                if (result.Data.CheckoutLogs.Any(c => c.ReturnDate == null))
                 {
                     Console.WriteLine("\nChecked Out Items");
                     Console.WriteLine("=================");
 
                     Console.WriteLine($"{"Title",-40} {"Type",-10} {"Checkout Date",-15} {"Due Date"}");
-                    foreach(var item in data.CheckoutLogs.Where(c=>c.ReturnDate == null))
+                    foreach(var item in result.Data.CheckoutLogs.Where(c=>c.ReturnDate == null))
                     {
                         Console.WriteLine($"{item.Media.Title,-40} {item.Media.MediaType.MediaTypeName,-10} {item.CheckoutDate.ToShortDateString(),-15} {item.DueDate.ToShortDateString()}");
                     }
@@ -71,13 +62,13 @@ namespace LibraryManagement.ConsoleUI.IO
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                Console.WriteLine(result.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void AddBorrower(HttpClient httpClient)
+        public static void AddBorrower(IBorrowerService service)
         {
             Console.Clear();
             Console.WriteLine("Add New Borrower");
@@ -90,37 +81,32 @@ namespace LibraryManagement.ConsoleUI.IO
             newBorrower.Email = Utilities.GetRequiredString("Email: ");
             newBorrower.Phone = Utilities.GetRequiredString("Phone: ");
 
-            var payload = Utilities.ConstructJsonPayload(newBorrower);
-            var result = httpClient.PostAsync("/api/borrowers/", payload).Result;
+            var result = service.AddBorrower(newBorrower);
 
-            if (result.IsSuccessStatusCode)
+            if(result.Ok)
             {
                 Console.WriteLine($"Borrower created with id: {newBorrower.BorrowerID}");
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                Console.WriteLine(result.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void EditBorrower(HttpClient httpClient)
+        public static void EditBorrower(IBorrowerService service)
         {
             string email;
-            Borrower? borrower;
+            Result<Borrower> editResult;
 
             do
             {
                 email = Utilities.GetRequiredString("Enter borrower email: ");
+                editResult = service.GetBorrower(email);
 
-                var borrowerResult = httpClient.GetAsync("/api/borrowers/" + email).Result;
-
-                if (borrowerResult.IsSuccessStatusCode)
+                if(editResult.Ok)
                 {
-                    borrower = JsonSerializer.Deserialize<Borrower>(
-                        Utilities.GetStringContentFromResponse(borrowerResult),
-                        Utilities.GetJsonSerializerOptions());
                     break;
                 }
                 Console.WriteLine("Could not find borrower with that email!");
@@ -128,41 +114,38 @@ namespace LibraryManagement.ConsoleUI.IO
 
             Console.WriteLine("\nEdit Borrower (press enter to keep original value)");
 
-            borrower.FirstName = Utilities.GetEditedString($"First Name ({borrower.FirstName}): ", borrower.FirstName);
-            borrower.LastName = Utilities.GetEditedString($"Last Name ({borrower.LastName}): ", borrower.LastName);
-            borrower.Email = Utilities.GetEditedString($"Email ({borrower.Email}): ", borrower.Email);
-            borrower.Phone = Utilities.GetEditedString($"Phone ({borrower.Phone}): ", borrower.Phone);
+            editResult.Data.FirstName = Utilities.GetEditedString($"First Name ({editResult.Data.FirstName}): ", editResult.Data.FirstName);
+            editResult.Data.LastName = Utilities.GetEditedString($"Last Name ({editResult.Data.LastName}): ", editResult.Data.LastName);
+            editResult.Data.Email = Utilities.GetEditedString($"Email ({editResult.Data.Email}): ", editResult.Data.Email);
+            editResult.Data.Phone = Utilities.GetEditedString($"Phone ({editResult.Data.Phone}): ", editResult.Data.Phone);
 
-            var payload = Utilities.ConstructJsonPayload(borrower);
-            var updateResult = httpClient.PutAsync("/api/borrowers/" + borrower.BorrowerID, payload).Result;
+            var result = service.EditBorrower(editResult.Data);
 
-            if (updateResult.IsSuccessStatusCode)
+
+            if(result.Ok)
             {
                 Console.WriteLine("Borrower updated!");
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(updateResult));
+                Console.WriteLine(result.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void DeleteBorrower(HttpClient httpClient)
+        public static void DeleteBorrower(IBorrowerService service)
         {
             string email;
-            Borrower borrower;
+            Result<Borrower> deleteResult;
 
             do
             {
                 email = Utilities.GetRequiredString("Enter borrower email: ");
-                var borrowerResult = httpClient.GetAsync("/api/borrowers/" + email).Result;
+                deleteResult = service.GetBorrower(email);
 
-                if (borrowerResult.IsSuccessStatusCode)
+                if (deleteResult.Ok)
                 {
-                    borrower = JsonSerializer.Deserialize<Borrower>(
-                        Utilities.GetStringContentFromResponse(borrowerResult),
-                        Utilities.GetJsonSerializerOptions());
                     break;
                 }
                 Console.WriteLine("Could not find borrower with that email!");
@@ -170,7 +153,7 @@ namespace LibraryManagement.ConsoleUI.IO
 
             do
             {
-                Console.Write($"Are you sure you want to delete {borrower.LastName}, {borrower.FirstName} (Y/N)? ");
+                Console.Write($"Are you sure you want to delete {deleteResult.Data.LastName}, {deleteResult.Data.FirstName} (Y/N)? ");
                 string input = Console.ReadLine().ToUpper();
 
                 if(input == "N")
@@ -188,15 +171,15 @@ namespace LibraryManagement.ConsoleUI.IO
                 }
             } while (true);
 
-            var updateResult = httpClient.DeleteAsync("/api/borrowers/" + borrower.BorrowerID).Result;
+            var result = service.DeleteBorrower(deleteResult.Data);
 
-            if (updateResult.IsSuccessStatusCode)
+            if (result.Ok)
             {
                 Console.WriteLine("Borrower deleted!");
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(updateResult));
+                Console.WriteLine(result.Message);
             }
 
             Utilities.AnyKey();

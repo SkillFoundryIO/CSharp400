@@ -1,7 +1,5 @@
 ﻿
 using LibraryManagement.Core.Entities;
-using System.Text.Json;
-using System.Text;
 
 namespace LibraryManagement.ConsoleUI.IO
 {
@@ -146,25 +144,6 @@ namespace LibraryManagement.ConsoleUI.IO
                     return false;
                 }
             } while (true);
-        }
-
-        public static string GetStringContentFromResponse(HttpResponseMessage result)
-        {
-            return result.Content.ReadAsStringAsync().Result;
-        }
-
-        public static StringContent ConstructJsonPayload(object data)
-        {
-            var payload = JsonSerializer.Serialize(data);
-            return new StringContent(payload, Encoding.UTF8, "application/json");
-        }
-
-        public static JsonSerializerOptions GetJsonSerializerOptions()
-        {
-            return new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            };
         }
     }
 }

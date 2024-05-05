@@ -48,18 +48,17 @@ namespace LibraryManagement.ConsoleUI.IO
 
                 if (mediaResult.IsSuccessStatusCode)
                 {
-                    var data = JsonSerializer.Deserialize<List<Media>>(
+                    var checkedOutMedia = JsonSerializer.Deserialize<List<Media>>(
                         Utilities.GetStringContentFromResponse(mediaResult),
                         Utilities.GetJsonSerializerOptions());
 
-                    var selected = Utilities.SelectMediaFromList(data);
+                    var selectedMedia = Utilities.SelectMediaFromList(checkedOutMedia);
 
-                    var payload = Utilities.ConstructJsonPayload(borrowerEmail);
-                    var checkoutResult = httpClient.PostAsync("/api/checkout/media/" + selected.MediaID, payload).Result;
+                    var checkoutResult = httpClient.PostAsync($"/api/checkout/media/{selectedMedia.MediaID}/{borrowerEmail}", null).Result;
 
                     if (checkoutResult.IsSuccessStatusCode)
                     {
-                        Console.WriteLine($"{selected.Title} has been checked out.");
+                        Console.WriteLine($"{selectedMedia.Title} has been checked out.");
                         if (!Utilities.YesNoPrompt("Check out another item (Y/N)? "))
                         {
                             return;

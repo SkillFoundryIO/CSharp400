@@ -1,4 +1,5 @@
-﻿using LibraryManagement.Core.Entities;
+﻿using LibraryManagement.API.Models;
+using LibraryManagement.Core.Entities;
 using LibraryManagement.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,13 @@ namespace LibraryManagement.API.Controllers
     public class MediaController : ControllerBase
     {
         private readonly IMediaService _mediaService;
+        private readonly ILogger _logger;
 
-        public MediaController(IMediaService mediaService)
+        public MediaController(IMediaService mediaService,
+            ILogger<MediaController> logger)
         {
             _mediaService = mediaService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -26,8 +30,12 @@ namespace LibraryManagement.API.Controllers
             var result = _mediaService.GetMediaTypes();
 
             if (result.Ok)
+            {
+                _logger.LogInformation("Media types obtained successfully");
                 return Ok(result.Data);
+            }
 
+            _logger.LogError("Error listing media types. {Mesage}", result.Message);
             return StatusCode(500, result.Message);
         }
 
@@ -43,8 +51,12 @@ namespace LibraryManagement.API.Controllers
             var result = _mediaService.ListMedia(mediaTypeId);
 
             if (result.Ok)
+            {
+                _logger.LogInformation("Media by type obtained successfully");
                 return Ok(result.Data);
+            }
 
+            _logger.LogError("Error listing media by type. {Mesage}", result.Message);
             return StatusCode(500, result.Message);
         }
 
@@ -59,8 +71,12 @@ namespace LibraryManagement.API.Controllers
             var result = _mediaService.GetMostPopularMedia();
 
             if (result.Ok)
+            {
+                _logger.LogInformation("Top media by obtained successfully");
                 return Ok(result.Data);
+            }
 
+            _logger.LogError("Error listing top media. {Mesage}", result.Message);
             return StatusCode(500, result.Message);
         }
 
@@ -75,8 +91,12 @@ namespace LibraryManagement.API.Controllers
             var result = _mediaService.GetArchivedMedia();
 
             if (result.Ok)
+            {
+                _logger.LogInformation("Archived media by obtained successfully");
                 return Ok(result.Data);
+            }
 
+            _logger.LogError("Error listing archived media. {Mesage}", result.Message);
             return StatusCode(500, result.Message);
         }
 
@@ -87,14 +107,32 @@ namespace LibraryManagement.API.Controllers
         /// <returns></returns>
         [HttpPost("")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult AddMedia([FromBody] Media media)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult AddMedia(AddMedia media)
         {
-            var result = _mediaService.AddMedia(media);
+            if(ModelState.IsValid)
+            {
+                var entity = new Media
+                {
+                    Title = media.Title,
+                    MediaTypeID = media.MediaTypeID
+                };
 
-            if (result.Ok)
-                return Created();
+                var result = _mediaService.AddMedia(entity);
 
-            return StatusCode(500, result.Message);
+                if (result.Ok)
+                {
+                    _logger.LogInformation("Media added successfully");
+                    return Created("", entity);
+                }
+
+                _logger.LogError("Error adding media. {Mesage}", result.Message);
+                return StatusCode(500, result.Message);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
 
@@ -106,15 +144,40 @@ namespace LibraryManagement.API.Controllers
         /// <returns></returns>
         [HttpPost("{mediaId}/archive")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult ArchiveMedia(int mediaId, [FromBody] Media media)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult ArchiveMedia(int mediaId, EditMedia media)
         {
-            media.MediaID = mediaId;
-            var result = _mediaService.ArchiveMedia(media);
+            if (media.MediaID != mediaId)
+            {
+                ModelState.AddModelError("MediaID", "Mismatch between media object id and route id");
+                return BadRequest(ModelState);
+            }
+            
+            if(ModelState.IsValid)
+            {
+                var entity = new Media
+                {
+                    MediaID = media.MediaID,
+                    MediaTypeID = media.MediaTypeID,
+                    Title = media.Title,
+                    IsArchived = media.IsArchived
+                };
 
-            if (result.Ok)
-                return NoContent();
+                var result = _mediaService.ArchiveMedia(entity);
 
-            return StatusCode(500, result.Message);
+                if (result.Ok)
+                {
+                    _logger.LogInformation("Media archived successfully");
+                    return NoContent();
+                }
+
+                _logger.LogError("Error archiving media. {Mesage}", result.Message);
+                return StatusCode(500, result.Message);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
         /// <summary>
@@ -125,15 +188,41 @@ namespace LibraryManagement.API.Controllers
         /// <returns></returns>
         [HttpPut("{mediaId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult EditMedia(int mediaId, [FromBody] Media media)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult EditMedia(int mediaId, EditMedia media)
         {
-            media.MediaID = mediaId;
-            var result = _mediaService.EditMedia(media);
+            if (media.MediaID != mediaId)
+            {
+                ModelState.AddModelError("MediaID", "Mismatch between media object id and route id");
+                return BadRequest(ModelState);
+            }
 
-            if (result.Ok)
-                return NoContent();
+            if(ModelState.IsValid)
+            {
+                var entity = new Media
+                {
+                    MediaID = media.MediaID,
+                    MediaTypeID = media.MediaTypeID,
+                    Title = media.Title,
+                    IsArchived = media.IsArchived
+                };
 
-            return StatusCode(500, result.Message);
+                var result = _mediaService.EditMedia(entity);
+
+                if (result.Ok)
+                {
+                    _logger.LogInformation("Media updated successfully");
+                    return NoContent();
+                }
+
+                _logger.LogError("Error updating media. {Mesage}", result.Message);
+                return StatusCode(500, result.Message);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using LibraryManagement.ConsoleUI.IO;
+﻿using LibraryManagement.Application;
+using LibraryManagement.ConsoleUI.IO;
 using LibraryManagement.Core.Interfaces.Application;
 
 namespace LibraryManagement.ConsoleUI
@@ -6,15 +7,12 @@ namespace LibraryManagement.ConsoleUI
     public class App
     {
         IAppConfiguration _config;
-        HttpClient _httpClient;
+        ServiceFactory _serviceFactory;
 
         public App()
         {
             _config = new AppConfiguration();
-            _httpClient = new HttpClient()
-            {
-                BaseAddress = _config.GetBaseUri()
-            };
+            _serviceFactory = new ServiceFactory(_config);
         }
 
         public void Run()
@@ -51,19 +49,19 @@ namespace LibraryManagement.ConsoleUI
                 switch (choice)
                 {
                     case BorrowerMenuChoices.ListAllBorrowers:
-                        BorrowerWorkflows.GetAllBorrowers(_httpClient);
+                        BorrowerWorkflows.GetAllBorrowers(_serviceFactory.CreateBorrowerService());
                         break;
                     case BorrowerMenuChoices.ViewBorrower:
-                        BorrowerWorkflows.GetBorrower(_httpClient);
+                        BorrowerWorkflows.GetBorrower(_serviceFactory.CreateBorrowerService());
                         break;
                     case BorrowerMenuChoices.EditBorrower:
-                        BorrowerWorkflows.EditBorrower(_httpClient);
+                        BorrowerWorkflows.EditBorrower(_serviceFactory.CreateBorrowerService());
                         break;
                     case BorrowerMenuChoices.AddBorrower:
-                        BorrowerWorkflows.AddBorrower(_httpClient);
+                        BorrowerWorkflows.AddBorrower(_serviceFactory.CreateBorrowerService());
                         break;
                     case BorrowerMenuChoices.DeleteBorrower:
-                        BorrowerWorkflows.DeleteBorrower(_httpClient);
+                        BorrowerWorkflows.DeleteBorrower(_serviceFactory.CreateBorrowerService());
                         break;
                     case BorrowerMenuChoices.GoBack:
                         return;
@@ -81,22 +79,22 @@ namespace LibraryManagement.ConsoleUI
                 switch (choice)
                 {
                     case MediaMenuChoices.ListMedia:
-                        MediaWorkflows.ListMedia(_httpClient);
+                        MediaWorkflows.ListMedia(_serviceFactory.CreateMediaService());
                         break;
                     case MediaMenuChoices.AddMedia:
-                        MediaWorkflows.AddMedia(_httpClient);
+                        MediaWorkflows.AddMedia(_serviceFactory.CreateMediaService());
                         break;
                     case MediaMenuChoices.EditMedia:
-                        MediaWorkflows.EditMedia(_httpClient);
+                        MediaWorkflows.EditMedia(_serviceFactory.CreateMediaService());
                         break;
                     case MediaMenuChoices.ArchiveMedia:
-                        MediaWorkflows.ArchiveMedia(_httpClient);
+                        MediaWorkflows.ArchiveMedia(_serviceFactory.CreateMediaService());
                         break;
                     case MediaMenuChoices.ViewArchive:
-                        MediaWorkflows.ViewArchive(_httpClient);
+                        MediaWorkflows.ViewArchive(_serviceFactory.CreateMediaService());
                         break;
                     case MediaMenuChoices.MostPopularMediaReport:
-                        MediaWorkflows.MostPopularMedia(_httpClient);
+                        MediaWorkflows.MostPopularMedia(_serviceFactory.CreateMediaService());
                         break;
                     case MediaMenuChoices.GoBack:
                         return;
@@ -114,13 +112,13 @@ namespace LibraryManagement.ConsoleUI
                 switch (choice)
                 {
                     case CheckoutMenuChoices.CheckoutLog:
-                        CheckoutWorkflows.DisplayCheckoutLog(_httpClient);
+                        CheckoutWorkflows.DisplayCheckoutLog(_serviceFactory.CreateCheckoutService());
                         break;
                     case CheckoutMenuChoices.Checkout:
-                        CheckoutWorkflows.CheckoutMedia(_httpClient);
+                        CheckoutWorkflows.CheckoutMedia(_serviceFactory.CreateCheckoutService());
                         break;
                     case CheckoutMenuChoices.Return:
-                        CheckoutWorkflows.ReturnMedia(_httpClient);
+                        CheckoutWorkflows.ReturnMedia(_serviceFactory.CreateCheckoutService());
                         break;
                     case CheckoutMenuChoices.GoBack:
                         return;

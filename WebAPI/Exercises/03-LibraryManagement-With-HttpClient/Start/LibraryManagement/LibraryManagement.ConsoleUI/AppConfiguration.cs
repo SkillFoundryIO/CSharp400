@@ -1,4 +1,5 @@
 ﻿using LibraryManagement.Core.Entities;
+using LibraryManagement.Core.Interfaces.Application;
 using Microsoft.Extensions.Configuration;
 
 namespace LibraryManagement.ConsoleUI
@@ -13,11 +14,6 @@ namespace LibraryManagement.ConsoleUI
                 .AddJsonFile("appSettings.json")
                 .AddUserSecrets<Program>()
                 .Build();
-        }
-
-        public Uri GetBaseUri()
-        {
-            return new Uri(_configuration["BaseUri"]);
         }
 
         public string GetConnectionString()

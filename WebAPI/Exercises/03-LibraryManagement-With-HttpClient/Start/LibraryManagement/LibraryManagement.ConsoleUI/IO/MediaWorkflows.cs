@@ -1,196 +1,159 @@
 ﻿using LibraryManagement.Core.Entities;
-using System.Text;
-using System.Text.Json;
+using LibraryManagement.Core.Interfaces.Services;
 
 namespace LibraryManagement.ConsoleUI.IO
 {
     public class MediaWorkflows
     {
-        public static void ListMedia(HttpClient httpClient)
+        public static void ListMedia(IMediaService service)
         {
             Console.Clear();
 
-            var mediaTypesResult = httpClient.GetAsync("/api/media/types").Result;
+            var mediaTypesResult = service.GetMediaTypes();
 
-            if (mediaTypesResult.IsSuccessStatusCode)
+            if (mediaTypesResult.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<MediaType>>(
-                    Utilities.GetStringContentFromResponse(mediaTypesResult),
-                    Utilities.GetJsonSerializerOptions());
+                int mediaTypeId = GetMediaTypeFromUser(mediaTypesResult.Data);
+                var mediaResult = service.ListMedia(mediaTypeId);
 
-                int mediaTypeId = GetMediaTypeFromUser(data);
-
-                var mediaResult = httpClient.GetAsync("/api/media/types/" + mediaTypeId).Result;
-
-                if (mediaResult.IsSuccessStatusCode)
+                if (mediaResult.Ok)
                 {
-                    var mediaData = JsonSerializer.Deserialize<List<Media>>(
-                        Utilities.GetStringContentFromResponse(mediaResult),
-                        Utilities.GetJsonSerializerOptions());
-
-                    Utilities.PrintMediaList(mediaData);
+                    Utilities.PrintMediaList(mediaResult.Data);
                 }
                 else
                 {
-                    Console.WriteLine(Utilities.GetStringContentFromResponse(mediaResult));
+                    Console.WriteLine(mediaResult.Message);
                 }
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(mediaTypesResult));
+                Console.WriteLine(mediaTypesResult.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void AddMedia(HttpClient httpClient)
+        public static void AddMedia(IMediaService service)
         {
             Console.Clear();
 
-            var mediaTypesResult = httpClient.GetAsync("/api/media/types").Result;
+            var mediaTypesResult = service.GetMediaTypes();
 
-            if (mediaTypesResult.IsSuccessStatusCode)
+            if (mediaTypesResult.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<MediaType>>(
-                    Utilities.GetStringContentFromResponse(mediaTypesResult),
-                    Utilities.GetJsonSerializerOptions());
-
                 var newMedia = new Media();
-                newMedia.MediaTypeID = GetMediaTypeFromUser(data);
+                newMedia.MediaTypeID = GetMediaTypeFromUser(mediaTypesResult.Data);
                 newMedia.Title = Utilities.GetRequiredString("Enter title: ");
 
-                var payload = Utilities.ConstructJsonPayload(newMedia);
-                var result = httpClient.PostAsync("/api/media", payload).Result;
+                var result = service.AddMedia(newMedia);
 
-                if (result.IsSuccessStatusCode)
+                if (result.Ok)
                 {
                     Console.WriteLine($"Media added with id {newMedia.MediaID}!");
                 }
                 else
                 {
-                    Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                    Console.WriteLine(result.Message);
                 }
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(mediaTypesResult));
+                Console.WriteLine(mediaTypesResult.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void ArchiveMedia(HttpClient httpClient)
+        public static void ArchiveMedia(IMediaService service)
         {
             Console.Clear();
 
-            var mediaTypesResult = httpClient.GetAsync("/api/media/types").Result;
+            var mediaTypesResult = service.GetMediaTypes();
 
-            if (mediaTypesResult.IsSuccessStatusCode)
+            if (mediaTypesResult.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<MediaType>>(
-                    Utilities.GetStringContentFromResponse(mediaTypesResult),
-                    Utilities.GetJsonSerializerOptions());
+                int mediaTypeID = GetMediaTypeFromUser(mediaTypesResult.Data);
+                var mediaResult = service.ListMedia(mediaTypeID);
 
-                int mediaTypeId = GetMediaTypeFromUser(data);
-                var mediaResult = httpClient.GetAsync("/api/media/types/" + mediaTypeId).Result;
-
-                if (mediaResult.IsSuccessStatusCode)
+                if(mediaResult.Ok)
                 {
-                    var mediaData = JsonSerializer.Deserialize<List<Media>>(
-                        Utilities.GetStringContentFromResponse(mediaResult),
-                        Utilities.GetJsonSerializerOptions());
-
-                    var mediaToArchive = Utilities.SelectMediaFromList(mediaData.Where(m => !m.IsArchived).ToList());
+                    var mediaToArchive = Utilities.SelectMediaFromList(mediaResult.Data.Where(m => !m.IsArchived).ToList());
                     mediaToArchive.IsArchived = true;
 
-                    var payload = Utilities.ConstructJsonPayload(mediaToArchive);
-                    var result = httpClient.PostAsync("/api/media/" + mediaToArchive.MediaID + "/archive", payload).Result;
-                    if (result.IsSuccessStatusCode)
+                    var result = service.EditMedia(mediaToArchive);
+                    if(result.Ok)
                     {
                         Console.WriteLine($"{mediaToArchive.Title} is archived.");
                     }
                     else
                     {
-                        Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                        Console.WriteLine(result.Message);
                     }
                 }
                 else
                 {
-                    Console.WriteLine(Utilities.GetStringContentFromResponse(mediaResult));
+                    Console.WriteLine(mediaResult.Message);
                 }
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(mediaTypesResult));
+                Console.WriteLine(mediaTypesResult.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void EditMedia(HttpClient httpClient)
+        public static void EditMedia(IMediaService service)
         {
             Console.Clear();
 
-            var mediaTypesResult = httpClient.GetAsync("/api/media/types").Result;
+            var mediaTypesResult = service.GetMediaTypes();
 
-            if (mediaTypesResult.IsSuccessStatusCode)
+            if (mediaTypesResult.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<MediaType>>(
-                    Utilities.GetStringContentFromResponse(mediaTypesResult),
-                    Utilities.GetJsonSerializerOptions());
+                int mediaTypeID = GetMediaTypeFromUser(mediaTypesResult.Data);
+                var mediaResult = service.ListMedia(mediaTypeID);
 
-                int mediaTypeId = GetMediaTypeFromUser(data);
-                var mediaResult = httpClient.GetAsync("/api/media/types/" + mediaTypeId).Result;
-
-                if (mediaResult.IsSuccessStatusCode)
+                if (mediaResult.Ok)
                 {
-                    var mediaData = JsonSerializer.Deserialize<List<Media>>(
-                        Utilities.GetStringContentFromResponse(mediaResult),
-                        Utilities.GetJsonSerializerOptions());
-
-                    var mediaToEdit = Utilities.SelectMediaFromList(mediaData.Where(m => !m.IsArchived).ToList());
+                    var mediaToEdit = Utilities.SelectMediaFromList(mediaResult.Data.Where(m => !m.IsArchived).ToList());
                     mediaToEdit.Title = Utilities.GetEditedString($"Title ({mediaToEdit.Title}): ", mediaToEdit.Title);
 
-                    var payload = Utilities.ConstructJsonPayload(mediaToEdit);
-                    var result = httpClient.PutAsync("/api/media/" + mediaToEdit.MediaID, payload).Result;
-
-                    if (result.IsSuccessStatusCode)
+                    var result = service.EditMedia(mediaToEdit);
+                    if (result.Ok)
                     {
                         Console.WriteLine($"Changes saved!");
                     }
                     else
                     {
-                        Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                        Console.WriteLine(result.Message);
                     }
                 }
                 else
                 {
-                    Console.WriteLine(Utilities.GetStringContentFromResponse(mediaResult));
+                    Console.WriteLine(mediaResult.Message);
                 }
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(mediaTypesResult));
+                Console.WriteLine(mediaTypesResult.Message);
             }
 
             Utilities.AnyKey();
         }
 
-        public static void ViewArchive(HttpClient httpClient)
+        public static void ViewArchive(IMediaService service)
         {
             Console.Clear();
-            var result = httpClient.GetAsync("/api/media/archived").Result;
+            var result = service.GetArchivedMedia();
 
-            if (result.IsSuccessStatusCode)
+            if(result.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<Media>>(
-                    Utilities.GetStringContentFromResponse(result),
-                    Utilities.GetJsonSerializerOptions());
-                Utilities.PrintMediaList(data, "Archived Media");
+                Utilities.PrintMediaList(result.Data, "Archived Media");
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                Console.WriteLine(result.Message);
             }
 
             Utilities.AnyKey();
@@ -209,29 +172,25 @@ namespace LibraryManagement.ConsoleUI.IO
             return Utilities.GetChoiceInRange(1, types.Count());
         }
 
-        public static void MostPopularMedia(HttpClient httpClient)
+        public static void MostPopularMedia(IMediaService service)
         {
             Console.Clear();
 
-            var result = httpClient.GetAsync("/api/media/top").Result;
+            var result = service.GetMostPopularMedia();
 
-            if (result.IsSuccessStatusCode)
+            if(result.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<TopMediaItem>>(
-                    Utilities.GetStringContentFromResponse(result),
-                    Utilities.GetJsonSerializerOptions());
-
                 Console.WriteLine("Most Popular Media\n");
                 Console.WriteLine($"{"Checkout",-9} Title");
 
-                foreach(var item in data)
+                foreach(var item in result.Data)
                 {
                     Console.WriteLine($"{item.CheckoutCount,-9} {item.Title}");
                 }
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(result));
+                Console.WriteLine(result.Message);
             }
 
             Utilities.AnyKey();

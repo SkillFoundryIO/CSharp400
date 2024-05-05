@@ -1,32 +1,27 @@
 ﻿using LibraryManagement.Core.Entities;
-using System.Text;
-using System.Text.Json;
+using LibraryManagement.Core.Interfaces.Services;
 
 namespace LibraryManagement.ConsoleUI.IO
 {
     public class CheckoutWorkflows
     {
-        public static void DisplayCheckoutLog(HttpClient httpClient)
+        public static void DisplayCheckoutLog(ICheckoutService service)
         {
             Console.Clear();
             Console.WriteLine("Checked Out Media List\n");
 
-            var result = httpClient.GetAsync("/api/checkout/log").Result;
+            var result = service.GetCheckedoutMedia();
 
-            if (result.IsSuccessStatusCode)
+            if(result.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<CheckoutLog>>(
-                    Utilities.GetStringContentFromResponse(result),
-                    Utilities.GetJsonSerializerOptions());
-
-                if (data.Count() == 0)
+                if(result.Data.Count() == 0)
                 {
                     Console.WriteLine("There are no checked out items.");
                 }
                 else
                 {
                     Console.WriteLine($"{"Title",-40} {"Type",-10} {"Checkout",-10} Due Date");
-                    foreach (var log in data)
+                    foreach (var log in result.Data)
                     {
                         Console.WriteLine($"{log.Media.Title,-40} {log.Media.MediaType.MediaTypeName,-10} {log.CheckoutDate:d} {log.DueDate:d} {GetOverdueText(log.DueDate)}");
                     }
@@ -37,27 +32,22 @@ namespace LibraryManagement.ConsoleUI.IO
             Utilities.AnyKey();
         }
 
-        public static void CheckoutMedia(HttpClient httpClient)
+        public static void CheckoutMedia(ICheckoutService service)
         {
             Console.Clear();
             string borrowerEmail = Utilities.GetRequiredString("Borrower Email: ");
 
             do
             {
-                var mediaResult = httpClient.GetAsync("/api/checkout").Result;
+                var mediaResult = service.GetAvailableMedia();
 
-                if (mediaResult.IsSuccessStatusCode)
+                if (mediaResult.Ok)
                 {
-                    var data = JsonSerializer.Deserialize<List<Media>>(
-                        Utilities.GetStringContentFromResponse(mediaResult),
-                        Utilities.GetJsonSerializerOptions());
+                    var selected = Utilities.SelectMediaFromList(mediaResult.Data);
 
-                    var selected = Utilities.SelectMediaFromList(data);
+                    var checkoutResult = service.Checkout(selected.MediaID, borrowerEmail);
 
-                    var payload = Utilities.ConstructJsonPayload(borrowerEmail);
-                    var checkoutResult = httpClient.PostAsync("/api/checkout/media/" + selected.MediaID, payload).Result;
-
-                    if (checkoutResult.IsSuccessStatusCode)
+                    if (checkoutResult.Ok)
                     {
                         Console.WriteLine($"{selected.Title} has been checked out.");
                         if (!Utilities.YesNoPrompt("Check out another item (Y/N)? "))
@@ -67,14 +57,14 @@ namespace LibraryManagement.ConsoleUI.IO
                     }
                     else
                     {
-                        Console.WriteLine(Utilities.GetStringContentFromResponse(checkoutResult));
+                        Console.WriteLine(checkoutResult.Message);
                         Utilities.AnyKey();
                         return;
                     }
                 }
                 else
                 {
-                    Console.WriteLine(Utilities.GetStringContentFromResponse(mediaResult));
+                    Console.WriteLine(mediaResult.Message);
                     Utilities.AnyKey();
                     return; // if we can't load the media, we're done.
                 }
@@ -82,33 +72,27 @@ namespace LibraryManagement.ConsoleUI.IO
 
         }
 
-        public static void ReturnMedia(HttpClient httpClient)
+        public static void ReturnMedia(ICheckoutService service)
         {
             Console.Clear();
             Console.WriteLine("Select media to return\n");
 
-            var checkoutResult = httpClient.GetAsync("/api/checkout/log").Result;
+            var checkoutResult = service.GetCheckedoutMedia();
 
-            if (checkoutResult.IsSuccessStatusCode)
+            if(checkoutResult.Ok)
             {
-                var data = JsonSerializer.Deserialize<List<CheckoutLog>>(
-                    Utilities.GetStringContentFromResponse(checkoutResult),
-                    Utilities.GetJsonSerializerOptions());
-
-                if (data.Any())
+                if(checkoutResult.Data.Any())
                 {
-                    var selected = SelectLogFromList(data);
-                    var payload = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+                    var selected = SelectLogFromList(checkoutResult.Data);
+                    var returnResult = service.Return(selected.CheckoutLogID);
 
-                    var returnResult = httpClient.PostAsync("/api/checkout/returns/" + selected.CheckoutLogID, payload).Result;
-
-                    if (returnResult.IsSuccessStatusCode)
+                    if(returnResult.Ok)
                     {
                         Console.WriteLine($"\n{selected.Media.Title} has been returned.");
                     }
                     else
                     {
-                        Console.WriteLine(Utilities.GetStringContentFromResponse(returnResult));
+                        Console.WriteLine(returnResult.Message);
                     }
                 }
                 else
@@ -118,7 +102,7 @@ namespace LibraryManagement.ConsoleUI.IO
             }
             else
             {
-                Console.WriteLine(Utilities.GetStringContentFromResponse(checkoutResult));
+                Console.WriteLine(checkoutResult.Message);
             }
             Utilities.AnyKey();
         }
