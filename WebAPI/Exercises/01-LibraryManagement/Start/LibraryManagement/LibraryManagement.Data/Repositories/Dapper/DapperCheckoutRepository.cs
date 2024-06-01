@@ -56,7 +56,7 @@ namespace LibraryManagement.Data.Repositories.Dapper
                         FROM CheckoutLog cl 
                             INNER JOIN Media m ON cl.MediaID = m.MediaID 
                             INNER JOIN Borrower b ON cl.BorrowerID b.BorrowerID 
-                            INNER JOIN Media mt ON m.MediaTypeID = mt.MediaTypeID
+                            INNER JOIN MediaType mt ON m.MediaTypeID = mt.MediaTypeID
                         WHERE ReturnDate IS NULL";
 
             using(var cn = new SqlConnection(_connectionString))

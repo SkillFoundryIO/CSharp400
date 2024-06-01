@@ -14,6 +14,6 @@ namespace LibraryManagement.Core.Entities
 
         public string Phone { get; set; }
 
-        public List<CheckoutLog> CheckoutLogs { get; set; }
+        public List<CheckoutLog>? CheckoutLogs { get; set; }
     }
 }
