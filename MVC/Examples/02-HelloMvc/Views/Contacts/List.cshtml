@@ -1,0 +1,25 @@
+﻿@model List<Contact>
+@{
+    ViewData["Title"] = "Contacts List";
+}
+
+<h1>Contacts List</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contact in Model)
+        {
+            <tr>
+                <td>@contact.ContactID</td>
+                <td>@contact.Name</td>
+                <td>@contact.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>
