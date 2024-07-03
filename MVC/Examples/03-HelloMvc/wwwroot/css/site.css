@@ -1,0 +1,84 @@
+﻿table {
+    width: 100%;
+}
+
+thead {
+    background-color: black;
+    color: white;
+}
+
+nav {
+    background-color: black;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 16px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+form {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+form div label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form div input[type="text"],
+form div input[type="email"],
+form div select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+form div button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#message {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #000;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
