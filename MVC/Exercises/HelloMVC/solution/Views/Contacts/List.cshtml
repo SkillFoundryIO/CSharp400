@@ -1,0 +1,44 @@
+﻿@model List<Contact>
+@{
+    ViewData["Title"] = "Contacts List";
+}
+
+<h1>Contacts List</h1>
+@if (TempData["message"] != null)
+{
+    <div id="message">
+        @TempData["message"]
+    </div>
+}
+<p><a asp-controller="Contacts" asp-action="Create">Create New Contact</a></p>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contact in Model)
+        {
+            <tr>
+                <td>@contact.ContactID</td>
+                <td>@contact.Name</td>
+                <td>@contact.Email</td>
+                <td>@contact.CountryCode</td>
+                <td>
+                    <a asp-controller="Contacts" asp-action="Edit" 
+                        asp-route-id="@contact.ContactID">Edit</a>
+                </td>
+                <td>
+                    <a asp-controller="Contacts" asp-action="Delete"
+                       asp-route-id="@contact.ContactID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

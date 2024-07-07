@@ -1,0 +1,24 @@
+﻿@model RadioButtons
+@{
+    ViewData["Title"] = "Radio Buttons";
+}
+
+<h2>Radio Button Example</h2>
+@if (!string.IsNullOrEmpty(Model.SelectedCountry))
+{
+    <p>You selected @Model.SelectedCountry</p>
+}
+
+<p>This form shows how to create a radio button list.</p>
+<form asp-action="RadioButtonExample" asp-controller="Home">
+    @for (int i = 0; i < Model.Countries.Count(); i++)
+    {
+        <div>
+            <label>@Model.Countries[i].Name</label>
+            <input type="radio" asp-for="SelectedCountry" value="@Model.Countries[i].Code" />
+        </div>
+    }
+    <div>
+        <button type="submit">Submit</button>
+    </div>   
+</form>

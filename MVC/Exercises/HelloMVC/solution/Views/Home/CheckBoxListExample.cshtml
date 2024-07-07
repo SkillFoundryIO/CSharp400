@@ -1,0 +1,34 @@
+﻿@model CheckBoxList
+@{
+    ViewData["Title"] = "Checkbox List";
+}
+
+<h2>CheckBox List Example</h2>
+@if (Model.SelectedCountries.Count(c => c.Selected) > 0)
+{
+    <p>You selected @string.Join(",", 
+        Model.SelectedCountries.Where(c=>c.Selected)
+        .Select(c => c.Text))</p>
+}
+else
+{
+    <p>You have not selected any items</p>
+}
+
+<p>This form shows how to create a radio button list.</p>
+<form asp-action="CheckBoxListExample" asp-controller="Home">
+    @for (int i = 0; i < Model.SelectedCountries.Count(); i++)
+    {
+        <div>
+            <input type="hidden" asp-for="@Model.SelectedCountries[i].ID" />
+            <input type="hidden" asp-for="@Model.SelectedCountries[i].Text" />
+            <label>@Model.SelectedCountries[i].Text</label>
+            <input type="checkbox" 
+                asp-for="@Model.SelectedCountries[i].Selected" 
+                id="@Model.SelectedCountries[i].ID" />
+        </div>
+    }
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</form>
