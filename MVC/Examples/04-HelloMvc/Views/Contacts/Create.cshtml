@@ -1,0 +1,36 @@
+﻿@model ContactForm
+@{
+    ViewData["Title"] = "Create Contact";
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<h2>Create Contact</h2>
+<form asp-controller="Contacts" asp-action="Create" method="post">
+    <div asp-validation-summary="None"></div>
+    @Html.AntiForgeryToken()
+    <div>
+        <label asp-for="Contact.Name"></label>
+        <input asp-for="Contact.Name" />
+        <span asp-validation-for="Contact.Name"></span>
+    </div>
+    <div>
+        <label asp-for="Contact.Email"></label>
+        <input asp-for="Contact.Email" type="email" />
+        <span asp-validation-for="Contact.Email"></span>
+    </div>
+    <div>
+        <label asp-for="Contact.CountryCode"></label>
+        <select asp-for="Contact.CountryCode" asp-items="Model.Countries"></select>
+    </div>
+    <div>
+        <label asp-for="Contact.DoB"></label>
+        <input asp-for="Contact.DoB" />
+        <span asp-validation-for="Contact.DoB"></span>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+    </div>
+</form>

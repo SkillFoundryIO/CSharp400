@@ -1,0 +1,30 @@
+﻿@model ContactForm
+@{
+    ViewData["Title"] = "Edit Contact";
+}
+
+<h2>Edit Contact</h2>
+<form asp-controller="Contacts" asp-action="Edit" 
+        asp-route-id="@Model.Contact.ContactID" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Contact.ContactID" type="hidden" />
+    <div>
+        <label asp-for="Contact.Name"></label>
+        <input asp-for="Contact.Name" />
+    </div>
+    <div>
+        <label asp-for="Contact.Email"></label>
+        <input asp-for="Contact.Email" type="email" />
+    </div>
+    <div>
+        <label asp-for="Contact.CountryCode"></label>
+        <select asp-for="Contact.CountryCode" asp-items="Model.Countries"></select>
+    </div>
+    <div>
+        <label asp-for="Contact.DoB"></label>
+        <input asp-for="Contact.DoB" />
+    </div>
+    <div>
+        <button type="submit">Save</button>
+    </div>
+</form>

@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery-validation-unobtrusive@4.0.0",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
+    },
+    {
+      "library": "jquery-validate@1.20.0",
+      "destination": "wwwroot/lib/jquery-validate/",
+      "files": [
+        "jquery.validate.min.js"
+      ]
+    },
+    {
+      "library": "jquery@3.7.1",
+      "destination": "wwwroot/lib/jquery/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "aspnet-client-validation@0.10.1",
+      "destination": "wwwroot/lib/aspnet-client-validation/",
+      "files": [
+        "dist/aspnet-validation.min.js"
+      ]
+    }
+  ]
+}
