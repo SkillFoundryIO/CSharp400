@@ -1,0 +1,61 @@
+﻿@model LibraryManagement.Core.Entities.Borrower
+@{
+    ViewData["Title"] = "Borrower Details";
+}
+
+<h1 class="mb-3">Borrower Details</h1>
+<form class="mb-3">
+    <div class="mb-3 col-md-3">
+        <label asp-for="FirstName" class="form-label">First Name</label>
+        <input type="text" class="form-control" asp-for="FirstName" readonly>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="LastName" class="form-label">Last Name</label>
+        <input type="text" class="form-control" asp-for="LastName" readonly>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input type="text" class="form-control" asp-for="Email" readonly>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="Phone" class="form-label">Phone</label>
+        <input type="text" class="form-control" asp-for="Phone" readonly>
+    </div>
+</form>
+<h2 class="mb-3">Checkout Items</h2>
+@if(Model.CheckoutLogs.Any())
+{
+    <table class="table table-striped table-dark">
+        <thead>
+            <tr>
+                <th>Media Type</th>
+                <th>Title</th>
+                <th>Checkout Date</th>
+                <th>Due Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model.CheckoutLogs)
+            {
+                <tr>
+                    <td>@item.Media.MediaType.MediaTypeName</td>
+                    <td>@item.Media.Title</td>
+                    <td>@item.CheckoutDate.ToShortDateString()</td>
+                    <td>@item.DueDate.ToShortDateString()</td>
+                    <td>
+                        <form asp-controller="Checkout" asp-action="BorrowerReturn" asp-route-id="@item.CheckoutLogID">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="BorrowerID" value="@item.BorrowerID" />
+                            <button type="submit" class="btn btn-link">Check In</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>This borrower has no checked out items.</p>
+}

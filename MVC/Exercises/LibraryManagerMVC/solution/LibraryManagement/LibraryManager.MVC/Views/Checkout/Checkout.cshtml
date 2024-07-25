@@ -1,0 +1,19 @@
+﻿@model CheckoutModel
+@{
+    ViewData["Title"] = "Checkout Media";
+}
+
+<h1 class="mb-3">Checkout Media</h1>
+<h3>Media</h3>
+<p class="mb-3">@Model.Media.MediaType.MediaTypeName - @Model.Media.Title</p>
+<form asp-controller="Checkout" asp-action="Checkout" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <div class="mb-3 col-md-3">
+        <label asp-for="BorrowerEmail" class="form-label">Email</label>
+        <input type="email" class="form-control" asp-for="BorrowerEmail">
+    </div>
+    <div class="d-flex justify-content-start col-md-3">
+        <button type="submit" class="btn btn-primary me-3">Save</button>
+        <a asp-action="AvailableList" asp-controller="Checkout">Go Back</a>
+    </div>
+</form>

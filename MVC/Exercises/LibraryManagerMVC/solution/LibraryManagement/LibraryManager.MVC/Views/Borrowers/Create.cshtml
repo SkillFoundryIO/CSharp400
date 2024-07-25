@@ -1,0 +1,33 @@
+﻿@model BorrowerForm
+@{
+    ViewData["Title"] = "Create Borrower";
+}
+
+<h1 class="mb-3">Create Borrower</h1>
+<form class="mb-3" asp-controller="Borrowers" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div class="mb-3 col-md-3">
+        <label asp-for="FirstName" class="form-label">First Name</label>
+        <input type="text" class="form-control" asp-for="FirstName">
+        <span asp-validation-for="FirstName"></span>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="LastName" class="form-label">Last Name</label>
+        <input type="text" class="form-control" asp-for="LastName">
+        <span asp-validation-for="LastName"></span>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input type="email" class="form-control" asp-for="Email">
+        <span asp-validation-for="Email"></span>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="Phone" class="form-label">Phone</label>
+        <input type="text" class="form-control" asp-for="Phone">
+        <span asp-validation-for="Phone"></span>
+    </div>
+    <div class="d-flex justify-content-start col-md-3">
+        <button type="submit" class="btn btn-primary me-3">Save</button>
+        <a asp-action="Index" asp-controller="Borrowers">Go Back</a>
+    </div>
+</form>

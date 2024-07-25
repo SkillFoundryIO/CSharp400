@@ -1,0 +1,30 @@
+﻿@model MediaForm
+@{
+    ViewData["Title"] = "Edit Media";
+}
+
+<h1 class="mb-3">Edit Media</h1>
+<form class="mb-3" asp-controller="Media" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="MediaID" />
+    <div class="mb-3 col-md-3">
+        <label asp-for="SelectedMediaTypeID" class="form-label">Media Type</label>
+        <select class="form-control" asp-for="SelectedMediaTypeID" asp-items="Model.MediaTypes">
+            <option value="">- SELECT -</option>
+        </select>
+        <span asp-validation-for="SelectedMediaTypeID"></span>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="Title" class="form-label">Title</label>
+        <input type="text" class="form-control" asp-for="Title">
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div class="mb-3 col-md-3 form-check">
+        <input type="checkbox" asp-for="IsArchived" class="form-check-input" />
+        <label asp-for="IsArchived" class="form-check-label">Archived</label>
+    </div>
+    <div class="d-flex justify-content-start col-md-3">
+        <button type="submit" class="btn btn-primary me-3">Save</button>
+        <a asp-action="Index" asp-controller="Media">Go Back</a>
+    </div>
+</form>

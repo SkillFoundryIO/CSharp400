@@ -1,0 +1,53 @@
+﻿@using LibraryManagement.Core.Entities
+@model IEnumerable<CheckoutLog>
+@{
+    ViewData["Title"] = "Return Media";
+}
+<h1 class="mb-3">Return Media</h1>
+@if(Model != null && Model.Any())
+{
+    <table class="table table-striped table-dark">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Borrower</th>
+                <th>Checkout Date</th>
+                <th>Due Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var log in Model)
+            {
+                <tr>
+                    <td>
+                        @log.Media.MediaType.MediaTypeName
+                    </td>
+                    <td>
+                        @log.Media.Title
+                    </td>
+                    <td>
+                        @log.Borrower.Email
+                    </td>
+                    <td>
+                        @log.CheckoutDate.ToShortDateString()
+                    </td>
+                    <td>
+                        @log.DueDate.ToShortDateString()
+                    </td>
+                    <td>
+                        <form asp-action="ReturnList" asp-controller="Checkout" asp-route-id="@log.CheckoutLogID" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link">Check In</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>There are no checked out items!</p>
+}

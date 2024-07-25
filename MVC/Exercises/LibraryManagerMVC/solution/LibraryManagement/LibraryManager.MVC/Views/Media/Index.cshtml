@@ -1,0 +1,55 @@
+﻿@model MediaList
+@{
+    ViewData["Title"] = "Media Search";
+}
+
+<h1 class="mb-3">Media Search</h1>
+<p class="mb-3">Search for media with the form below.</p>
+<p class="mb-3">You may also <a asp-controller="Media" asp-action="Create">create new media</a>.</p>
+<form asp-controller="Media" asp-action="Index" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <div class="mb-3 col-md-3">
+        <label asp-for="SelectedMediaTypeID" class="form-label">Media Type</label>
+        <select asp-for="SelectedMediaTypeID" asp-items="Model.MediaTypes" class="form-control">
+            <option value="">- SELECT -</option>
+        </select> 
+        <span asp-validation-for="SelectedMediaTypeID"></span>
+    </div>
+    <div class="mb-3 col-md-3">
+        <label asp-for="Title" class="form-label">Title</label>
+        <input type="text" class="form-control" asp-for="Title">
+    </div>
+    <div class="mb-3 col-md-3 form-check">
+        <input type="checkbox" asp-for="ShowArchived" class="form-check-input" />
+        <label asp-for="ShowArchived" class="form-check-label">Archived</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+@if (Model.SearchResults != null)
+{
+    <table class="table table-striped table-dark">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Archived</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var media in Model.SearchResults)
+            {
+                <tr>
+                    <td>@media.Title</td>
+                    <td>@if(media.IsArchived)
+                        {
+                            <img src="~/img/check.svg" width="25px" height="25px" />
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="Media" asp-action="Edit" asp-route-id="@media.MediaID">edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

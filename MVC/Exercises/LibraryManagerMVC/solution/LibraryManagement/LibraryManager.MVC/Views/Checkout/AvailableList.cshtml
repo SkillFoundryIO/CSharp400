@@ -1,0 +1,38 @@
+﻿@using LibraryManagement.Core.Entities
+@model IEnumerable<Media>
+@{
+    ViewData["Title"] = "Available Media";
+}
+<h1 class="mb-3">Available Media</h1>
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped table-dark">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var media in Model)
+            {
+                <tr>
+                    <td>
+                        @media.MediaType.MediaTypeName
+                    </td>
+                    <td>
+                        @media.Title
+                    </td>
+                    <td>
+                        <a asp-action="Checkout" asp-controller="Checkout" asp-route-id="@media.MediaID">Checkout</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>There are no available media!</p>
+}

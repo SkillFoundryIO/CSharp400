@@ -1,0 +1,43 @@
+﻿@model BorrowerList
+@{
+    ViewData["Title"] = "Borrower Search";
+}
+
+<h1 class="mb-3">Borrower Search</h1>
+<p class="mb-3">Search for a borrower by email address. Leave blank to return all borrowers</p>
+<p class="mb-3">You may also <a asp-controller="Borrowers" asp-action="Create">create a borrower</a>.</p>
+<form asp-controller="Borrowers" asp-action="Index" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <div class="mb-3 col-md-3">
+        <label asp-for="SearchEmail" class="form-label">Email</label>
+        <input type="email" class="form-control" asp-for="SearchEmail">
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+@if(Model.Borrowers != null)
+{
+    <table class="table table-striped table-dark">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var b in Model.Borrowers)
+            {
+                <tr>
+                    <td>@b.LastName, @b.FirstName</td>
+                    <td>@b.Email</td>
+                    <td>@b.Phone</td>
+                    <td>
+                        <a asp-controller="Borrowers" asp-action="Details" asp-route-id="@b.BorrowerID">details</a> | 
+                        <a asp-controller="Borrowers" asp-action="Edit" asp-route-id="@b.BorrowerID">edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
