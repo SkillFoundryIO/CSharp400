@@ -1,0 +1,25 @@
+﻿@model IdentityBasics.Models.LoginForm
+@{
+    ViewData["Title"] = "Log In";
+}
+
+
+<h1>Log In</h1>
+<form asp-action="Login" asp-controller="Account" method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group col-md-3">
+        <label asp-for="UserName">User Name</label>
+        <input asp-for="UserName" class="form-control" />
+    </div>
+    <div class="form-group col-md-3">
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" class="form-control" />
+    </div>
+    <div class="form-group col-md-3">
+        <label asp-for="RememberMe">Remember Me</label>
+        <input asp-for="RememberMe" class="form-check" />
+    </div>
+    <button type="submit" class="btn btn-primary">Log In</button>
+</form>
+
+

@@ -1,0 +1,23 @@
+﻿@model IdentityBasics.Models.UserData
+@{
+    ViewData["Title"] = "Home";
+}
+
+<h1>Welcome to Identity Basics</h1>
+
+<p>Authenticated: @Model.IsAuthenticated</p>
+<p>User: @Model.Name</p>
+<p>Claims: 
+    @if(!Model.Claims.Any())
+    {
+        <span>None</span>
+    }
+    else
+    {
+        foreach(var c in Model.Claims)
+        {
+            <span>@c.ToString()</span><br />
+        }
+    }
+</p>
+

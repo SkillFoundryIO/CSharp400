@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <nav class="d-flex justify-content-end bg-black p-3">
+        <partial name="_AuthPartial" />
+    </nav>
+    <div class="container">
+        @if(TempData["message"] != null)
+        {
+            <p class="bg-info text-white">@TempData["message"]</p>
+        }
+        @RenderBody()
+    </div>
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
