@@ -44,9 +44,9 @@ namespace LibraryManagement.Data.Repositories
         {
             return _dbContext.Borrower
                 .Include(b => b.CheckoutLogs)
-
                     .ThenInclude(c => c.Media)
                     .ThenInclude(m => m.MediaType)
+                .AsNoTracking()
                 .FirstOrDefault(b => b.Email == email);
         }
 
@@ -56,6 +56,7 @@ namespace LibraryManagement.Data.Repositories
                 .Include(b => b.CheckoutLogs)
                     .ThenInclude(c => c.Media)
                     .ThenInclude(m => m.MediaType)
+                .AsNoTracking()
                 .FirstOrDefault(b => b.BorrowerID == id);
         }
 
