@@ -1,4 +1,5 @@
-﻿using LibraryManagement.Core.Entities;
+﻿using LibraryManagement.API.Models;
+using LibraryManagement.Core.Entities;
 using LibraryManagement.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,7 +43,20 @@ namespace LibraryManagement.API.Controllers
             var result = _checkoutService.GetCheckedoutMedia();
 
             if (result.Ok)
-                return Ok(result.Data);
+            {
+                var dtos = result.Data.Select(d => new CheckoutLogDTO
+                {
+                    CheckoutLogID = d.CheckoutLogID,
+                    BorrowerName = $"{d.Borrower.FirstName} {d.Borrower.LastName}",
+                    Title = d.Media.Title,
+                    MediaTypeName = d.Media.MediaType.MediaTypeName,
+                    CheckoutDate = d.CheckoutDate,
+                    DueDate = d.DueDate
+                });
+
+                return Ok(dtos);
+            }
+
 
             return StatusCode(500, result.Message);
         }

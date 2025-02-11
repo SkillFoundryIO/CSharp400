@@ -43,8 +43,8 @@ namespace LibraryManagement.Data.Repositories
         public Borrower? GetByEmail(string email)
         {
             return _dbContext.Borrower
+                .AsNoTracking()
                 .Include(b => b.CheckoutLogs)
-
                     .ThenInclude(c => c.Media)
                     .ThenInclude(m => m.MediaType)
                 .FirstOrDefault(b => b.Email == email);
@@ -53,6 +53,7 @@ namespace LibraryManagement.Data.Repositories
         public Borrower? GetById(int id)
         {
             return _dbContext.Borrower
+                .AsNoTracking()
                 .Include(b => b.CheckoutLogs)
                     .ThenInclude(c => c.Media)
                     .ThenInclude(m => m.MediaType)
